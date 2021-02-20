@@ -52,7 +52,7 @@ class HelloAPIView(APIView):
     def put(self, request, pk=None):
         """ Handle updating an object """
         # put 요청엔 일반적으로 primary key로 update할 id의 object를 매치
-        # 여기선 object id가 없으니 None으로
+        # 여기선 object id가 없으니 None
         return Response({'method': 'PUT'})
 
     def patch(self, request, pk=None):
