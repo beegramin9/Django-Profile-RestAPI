@@ -5,10 +5,14 @@ Calling other APIs / Services
 Accessing local files or data
 returns a response """
 from rest_framework.views import APIView
+from rest_framework import viewsets
 # View로부터 response를 얻어옴
 from rest_framework.response import Response
 from rest_framework import status
 from profiles_api import serializers
+
+# Nest처럼 복잡한 로직 + DB 인터랙션 쓰려면
+# API View 써야 함
 
 
 class HelloAPIView(APIView):
@@ -62,3 +66,52 @@ class HelloAPIView(APIView):
     def delete(self, request, pk=None):
         """ Delete an object """
         return Response({'method': 'DELETE'})
+
+# 미리 빌트인된 service 함수들. 즉 정해져있던거야
+
+
+class HelloViewSet(viewsets.ViewSet):
+    """ Test API ViewSet """
+    # ViewSet에서도 사용가능
+    serializer_class = serializers.HelloSerializers
+
+    # 전체 다가지고 오는
+    def list(self, request):
+        """ Return a hello message """
+        a_viewset = [
+            'Uses actions (list, create, retrieve, update, partial_update)',
+            'Automatically maps to URLS using routers',
+            'Provides more functionality with less code'
+        ]
+        return Response({'message': 'hello', 'a_viewset': a_viewset})
+
+    def create(self, request):
+        """ Create a new hello message """
+        serializer = self.serializer_class(data=request.data)
+
+        if serializer.is_valid():
+            name = serializer.validated_data.get('name')
+            message = f"Hello {name}"
+            return Response({'message': message})
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    # where절로 가져오는
+    def retrieve(self, request, pk=None):
+        """ Handle getting an object by its ID """
+        return Response({'http_method': 'GET'})
+
+    # Put이나 Patch가 보이지 않는 이유는
+    # 저 두개는 특정한 object를 업뎃하는거니까 pk(id)를 예상하는데
+    # 그냥 /api/hello-viewset으로 들어가면 안됨
+    def update(self, request, pk=None):
+        """ Handle updating an object """
+        return Response({'http_method': 'PUT'})
+
+    def partial_update(self, request, pk=None):
+        """ Handle updating part of an update """
+        return Response({'http_method': 'PATCH'})
+
+    def destroy(self, request, pk=None):
+        """ Handle removing an object """
+        return Response({'http_method': "DELETE"})
