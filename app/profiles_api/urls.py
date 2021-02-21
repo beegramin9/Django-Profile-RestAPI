@@ -21,5 +21,6 @@ urlpatterns = [
     # 이게 NestJS의 controller - service이랑 다른 점
     # as_view()로 html로 render해서 Postman 역할을 한다
     path('hello-view/', views.HelloAPIView.as_view()),
+    path('login/', views.UserLoginApiView.as_view()),
     path('', include(router.urls))
 ]

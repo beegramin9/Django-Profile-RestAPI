@@ -21,6 +21,10 @@ from profiles_api import permissions
 from rest_framework.authentication import TokenAuthentication
 from rest_framework import filters
 
+# 로그인 후 User에게 Auth Token 부여하기
+from rest_framework.authtoken.views import ObtainAuthToken
+from rest_framework.settings import api_settings
+
 
 class HelloAPIView(APIView):
     """ Test API View """
@@ -142,3 +146,10 @@ class UserProfileViewSet(viewsets.ModelViewSet):
     filter_backends = (filters.SearchFilter,)
     # 어떤 field을 searchable하게 할건데?
     search_fields = ('name', 'email')
+
+
+class UserLoginApiView(ObtainAuthToken):
+    """ Handle creating user authentication tokens """
+    # 그냥 부모클래스를 url에 더해도 되지만 default로는 browsable에 보이지 않는다
+    # Override해서 새로 정의해야지 browsable
+    renderer_classes = api_settings.DEFAULT_RENDERER_CLASSES
