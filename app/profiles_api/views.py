@@ -9,10 +9,16 @@ from rest_framework import viewsets
 # View로부터 response를 얻어옴
 from rest_framework.response import Response
 from rest_framework import status
-from profiles_api import serializers
 
+from profiles_api import serializers
+from profiles_api import models
 # Nest처럼 복잡한 로직 + DB 인터랙션 쓰려면
 # API View 써야 함
+
+# permission
+from profiles_api import permissions
+# Nest처럼 bearer Token이랑 똑같은 개념
+from rest_framework.authentication import TokenAuthentication
 
 
 class HelloAPIView(APIView):
@@ -74,6 +80,7 @@ class HelloViewSet(viewsets.ViewSet):
     """ Test API ViewSet """
     # ViewSet에서도 사용가능
     serializer_class = serializers.HelloSerializers
+    # ViewSet의 빌트인 함수들
 
     # 전체 다가지고 오는
     def list(self, request):
@@ -115,3 +122,18 @@ class HelloViewSet(viewsets.ViewSet):
     def destroy(self, request, pk=None):
         """ Handle removing an object """
         return Response({'http_method': "DELETE"})
+
+# Model ViewSet 사용. 일반 ViewSet이랑 비슷한데
+# Model 관리에 트과되어있음
+
+
+class UserProfileViewSet(viewsets.ModelViewSet):
+    """ Handle creating and updating profiles """
+    serializer_class = serializers.UserProfileSerializer
+    # 쟝고 ORM
+    queryset = models.UserProfile.objects.all()
+    # 사용할 authentication 방법들 튜플이어야 함.
+    authentication_classes = (TokenAuthentication,)
+    # permission 줄 방법. 내가 만든 커스텀 퍼미션 사용
+    # 매 api request마다 사용됨
+    permission_classes = (permissions.UpdateOwnProfile,)
