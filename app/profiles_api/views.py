@@ -19,6 +19,7 @@ from profiles_api import models
 from profiles_api import permissions
 # Nest처럼 bearer Token이랑 똑같은 개념
 from rest_framework.authentication import TokenAuthentication
+from rest_framework import filters
 
 
 class HelloAPIView(APIView):
@@ -137,3 +138,7 @@ class UserProfileViewSet(viewsets.ModelViewSet):
     # permission 줄 방법. 내가 만든 커스텀 퍼미션 사용
     # 매 api request마다 사용됨
     permission_classes = (permissions.UpdateOwnProfile,)
+    # search 기능을 수행하는 filter
+    filter_backends = (filters.SearchFilter,)
+    # 어떤 field을 searchable하게 할건데?
+    search_fields = ('name', 'email')
