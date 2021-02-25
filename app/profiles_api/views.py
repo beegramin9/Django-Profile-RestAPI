@@ -1,6 +1,6 @@
 """ When to user APIViews?
 Need full control over the logic
-Processing files and rendering asynchronous respone
+Processing files and rendering asynchronous response
 Calling other APIs / Services
 Accessing local files or data
 returns a response """
@@ -24,6 +24,12 @@ from rest_framework import filters
 # 로그인 후 User에게 Auth Token 부여하기
 from rest_framework.authtoken.views import ObtainAuthToken
 from rest_framework.settings import api_settings
+
+# custom permissions말고 builtin Permissions
+# Unauthenticated여도 볼수는 있음
+from rest_framework.permissions import IsAuthenticatedOrReadOnly
+# Unauthenticated이면 아예 못봄
+from rest_framework.permissions import IsAuthenticated
 
 
 class HelloAPIView(APIView):
@@ -153,3 +159,24 @@ class UserLoginApiView(ObtainAuthToken):
     # 그냥 부모클래스를 url에 더해도 되지만 default로는 browsable에 보이지 않는다
     # Override해서 새로 정의해야지 browsable
     renderer_classes = api_settings.DEFAULT_RENDERER_CLASSES
+
+
+class UserProfileFeedViewSet(viewsets.ModelViewSet):
+    """ Handles creating, reading and updating profile feed items """
+    serializer_class = serializers.ProfileFeedItemSerializer
+    authentication_classes = (TokenAuthentication,)
+    queryset = models.ProfileFeedItem.objects.all()
+    permission_classes = (
+        permissions.UpdateOwnStatus,
+        IsAuthenticated
+    )
+
+    # Authenticated 된 사용자만 Feed업뎃 가능하게하려면 함수 추가
+    # ModelViewSet의 default 함수를 override할때 가능
+    # 매번 request가 들어오면 viewset의 serializer에서 validated되고 자동적으로 serializer.save()로 저장됨
+    # 요기 serializer는 ProfileFeedItemSerializer(=ModelSerilaizer), save() 를 가지고있는데
+    # 데이터를 object로 DB에 저장
+
+    def perform_create(self, serializer):
+        """ Sets the user profile to the logged-in user """
+        serializer.save(user_profile=self.request.user)

@@ -3,7 +3,7 @@ from rest_framework import permissions
 
 
 class UpdateOwnProfile(permissions.BasePermission):
-    """ Allow user to edit their own profile
+    """ Allow users to edit their own profile
     Others still can see his profile, but cannot edit it """
 
     # 이름 똑같이, 업뎃 api가 들어올 때마다 실행됨
@@ -21,3 +21,14 @@ class UpdateOwnProfile(permissions.BasePermission):
             return obj.id == request.user.id
             # 이게 False로 나오면 개별 /api/profile/1로 들어갔을 때
             # Put, Patch, Delete가 보이지 않는다.
+
+
+class UpdateOwnStatus(permissions.BasePermission):
+    """ Allow users to update thier own status """
+
+    def has_object_permission(self, request, view, obj):
+        """ Check the user is trying to update their own status """
+        if request.method in permissions.SAFE_METHODS:
+            return True
+        else:
+            return obj.user_profile.id == request.user.id

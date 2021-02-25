@@ -59,3 +59,13 @@ class UserProfileSerializer(serializers.ModelSerializer):
             instance.set_password(password)
         # 부모 클래스의 update 메소드 사용
         return super().update(instance, validated_data)
+
+
+class ProfileFeedItemSerializer(serializers.ModelSerializer):
+    """ Serializes profile feed items """
+    class Meta:
+        model = models.ProfileFeedItem
+        # 모델에 id 필드가 없어도 id를 여기서 주면 primary key로 줄 수 있다
+        fields = ('id', 'user_profile', 'status_text', 'created_on')
+        """ 사용자가 새 feed를 만들고 그걸 다른 사용자에게 assign하지 못하게 해야함 """
+        extra_kwargs = {'user_profile_field': {'read_only': True}}

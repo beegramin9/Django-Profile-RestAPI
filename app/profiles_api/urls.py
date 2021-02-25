@@ -13,6 +13,7 @@ router.register('hello-viewset', views.HelloViewSet, base_name='hello-viewset')
 쟝고 drf가 모델을 알아채기 때문에 base_name 줄 필요 없다.
 즉 queryset이 없거나 viewset을 override하고싶을떄만 base_name을 준다 """
 router.register('profile', views.UserProfileViewSet)
+router.register('feed', views.UserProfileFeedViewSet)
 
 
 # controller와 service를 연결

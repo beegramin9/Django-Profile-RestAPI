@@ -14,6 +14,10 @@ from django.contrib.auth.models import BaseUserManager
 # custom manager 설치 필요
 
 
+# settings.py 파일에서 AUTH_USER_MODEL 을 가져올 것
+from django.conf import settings
+
+
 class UserProfileManager(BaseUserManager):
     """ 쟝고 ORM에서 사용될 수 있는 함수들을 customizing """
 
@@ -86,3 +90,29 @@ class UserProfile(AbstractBaseUser, PermissionsMixin):
         <__main__.MyRepr object at 0x100656cc0>같은 객체를 나타내는 표현을
         return 값으로 대체한다. """
         return self.email
+
+# 모델 하나 만들때마다 Migration해줘야 함
+# Migrate -> makemigrations?
+# Migrate 한 이후에 admin.py 파일에 register해야함
+
+
+class ProfileFeedItem(models.Model):
+    """ Profile status update """
+    # 매 업데이트마다 새로운 profile feed item object를 생성
+    user_profile = models.ForeignKey(
+        # Django Auth User Model을 레퍼런싱할 때는 settings의 AUTH_USER_MODEL을 가져오는게 좋다.
+        # Configuration같은 느낌으로 하드코딩보다 나중에 변경이 쉽다.
+
+        settings.AUTH_USER_MODEL,  # UserProfileModel
+        # UserProfile 이 제거되면 key로 연결된 모델은 어떻게 할거야?
+        # CASCADE: 같이 제거됨
+        # NULL: 삭제된 UserProfile을 Null값으로 만듦
+        on_delete=models.CASCADE,
+    )
+    # Feed update 상태
+    status_text = models.CharField(max_length=255)
+    created_on = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        """ Return the model as a string """
+        return self.status_text
