@@ -4,6 +4,7 @@ DB 데이터 <-> JSON 데이터로 변환
 이 뿐만 아니라 NestJS의 DTO처럼 
 validation 역할도 수행한다
 기본 post 메소드(create)도 제공한다
+기본이 제공되는데 굳이 한번 더 쓴다는 것은 override한다는 것
 """
 from rest_framework import serializers
 from profiles_api import models
